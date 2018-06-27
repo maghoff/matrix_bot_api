@@ -32,13 +32,13 @@ fn main() {
 
     // Create another handler, and add it
     let mut who = StatelessHandler::new();
-    who.register_handle("whoareyou", whoareyou);
+    who.register_handle("whoareyou", Box::new(whoareyou));
 
     bot.add_handler(who);
 
     let mut roll = StatelessHandler::new();
-    roll.register_handle("roll", roll_dice);
-    roll.register_handle("help", roll_help);
+    roll.register_handle("roll", Box::new(roll_dice));
+    roll.register_handle("help", Box::new(roll_help));
 
     bot.add_handler(roll);
 
