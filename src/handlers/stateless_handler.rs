@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::cmp::min;
 use handlers::{Message, MessageHandler, extract_command, HandleResult};
 use MatrixBot;
 
@@ -52,7 +53,7 @@ impl MessageHandler for StatelessHandler {
                                             println!("Found handle for command \"{}\". Calling it.", &command);
                                         }
                                         let end_of_prefix = self.cmd_prefix.len() + command.len();
-                                        func(bot, message, &message.body[end_of_prefix+1..])
+                                        func(bot, message, &message.body[min(end_of_prefix+1, message.body.len())..])
                                     }
                                     None => {
                                         if bot.verbose {
