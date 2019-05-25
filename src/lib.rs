@@ -48,7 +48,7 @@ use self::chrono::prelude::*;
 
 use fractal_matrix_api::backend::Backend;
 use fractal_matrix_api::backend::BKCommand;
-use fractal_matrix_api::backend::BKResponse;
+pub use fractal_matrix_api::backend::BKResponse;
 use fractal_matrix_api::types::{Room, Message};
 
 use std::sync::mpsc::channel;
@@ -67,7 +67,7 @@ pub enum MessageType {
 
 pub struct MatrixBot {
     backend: Sender<BKCommand>,
-    rx: Receiver<BKResponse>,
+    pub rx: Receiver<BKResponse>,
     uid: Option<String>,
     verbose: bool,
     handlers: Option<Vec<Box<MessageHandler>>>,
@@ -183,8 +183,7 @@ impl MatrixBot {
         self.backend.send(BKCommand::SendMsg(m)).unwrap();
     }
 
-    /* --------- Private functions ------------ */
-    fn handle_recvs(&mut self, resp: BKResponse) -> bool {
+    pub fn handle_recvs(&mut self, resp: BKResponse) -> bool {
         if self.verbose {
             println!("<=== received: {:?}", resp);
         }
@@ -207,6 +206,7 @@ impl MatrixBot {
         true
     }
 
+    /* --------- Private functions ------------ */
     fn handle_messages(&mut self, messages: Vec<Message>) {
 
         for message in messages {
