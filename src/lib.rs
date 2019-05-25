@@ -110,12 +110,11 @@ impl MatrixBot {
         self.verbose = verbose;
     }
 
-    /// Blocking call that runs as long as the Bot is running.
-    /// Will call for each incoming text-message the given MessageHandler.
-    /// Bot will automatically join all rooms it is invited to.
-    /// Will return on shutdown only.
-    /// All messages prior to run() will be ignored.
-    pub fn run(mut self, user: &str, password: &str, homeserver_url: &str) {
+    /// Start a connection to the homeserver. The caller is responsible
+    /// for driving the message pump: read messages from `rx` and pass
+    /// them to `handle_recvs`.
+    /// All messages prior to connect() will be ignored.
+    pub fn connect(&self, user: &str, password: &str, homeserver_url: &str) {
         self.backend
             .send(BKCommand::Login(
                 user.to_string(),
@@ -123,6 +122,16 @@ impl MatrixBot {
                 homeserver_url.to_string(),
             ))
             .unwrap();
+    }
+
+    /// Blocking call that runs as long as the Bot is running.
+    /// Will call for each incoming text-message the given MessageHandler.
+    /// Bot will automatically join all rooms it is invited to.
+    /// Will return on shutdown only.
+    /// All messages prior to run() will be ignored.
+    pub fn run(&mut self, user: &str, password: &str, homeserver_url: &str) {
+        self.connect(user, password, homeserver_url);
+
         loop {
             let cmd = self.rx.recv().unwrap();
             if !self.handle_recvs(cmd) {
