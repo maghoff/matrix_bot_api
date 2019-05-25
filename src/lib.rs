@@ -134,7 +134,7 @@ impl MatrixBot {
 
         loop {
             let cmd = self.rx.recv().unwrap();
-            if !self.handle_recvs(cmd) {
+            if !self.handle_recvs(&cmd) {
                 break;
             }
         }
@@ -183,7 +183,7 @@ impl MatrixBot {
         self.backend.send(BKCommand::SendMsg(m)).unwrap();
     }
 
-    pub fn handle_recvs(&mut self, resp: BKResponse) -> bool {
+    pub fn handle_recvs(&mut self, resp: &BKResponse) -> bool {
         if self.verbose {
             println!("<=== received: {:?}", resp);
         }
@@ -193,7 +193,7 @@ impl MatrixBot {
             //BKResponse::Rooms(x, _) => self.handle_rooms(x),
             BKResponse::RoomMessages(x) => self.handle_messages(x),
             BKResponse::Token(uid, _) => {
-                self.uid = Some(uid); // Successfull login
+                self.uid = Some(uid.clone()); // Successfull login
                 self.backend.send(BKCommand::Sync).unwrap();
             }
             BKResponse::Sync(_) => self.backend.send(BKCommand::Sync).unwrap(),
@@ -207,7 +207,7 @@ impl MatrixBot {
     }
 
     /* --------- Private functions ------------ */
-    fn handle_messages(&mut self, messages: Vec<Message>) {
+    fn handle_messages(&mut self, messages: &Vec<Message>) {
 
         for message in messages {
             /* First of all, mark all new messages as "read" */
@@ -239,7 +239,7 @@ impl MatrixBot {
         }
     }
 
-    fn handle_rooms(&self, rooms: Vec<Room>) {
+    fn handle_rooms(&self, rooms: &Vec<Room>) {
         for rr in rooms {
             if rr.inv {
                 self.backend
